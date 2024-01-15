@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.44657898, g: 0.4964133, b: 0.5748178, a: 1}
+  m_IndirectSpecularColor: {r: 0.44657874, g: 0.49641275, b: 0.5748171, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -135,6 +135,22 @@ PrefabInstance:
       propertyPath: m_Name
       value: ZBufferCamera
       objectReference: {fileID: 0}
+    - target: {fileID: 5855958136823608759, guid: c9d1b93dd9d7c124c88f7da19cab0c5e, type: 3}
+      propertyPath: m_ClearFlags
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5855958136823608759, guid: c9d1b93dd9d7c124c88f7da19cab0c5e, type: 3}
+      propertyPath: far clip plane
+      value: 30
+      objectReference: {fileID: 0}
+    - target: {fileID: 5855958136823608759, guid: c9d1b93dd9d7c124c88f7da19cab0c5e, type: 3}
+      propertyPath: m_TargetTexture
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 8679098027741698210, guid: c9d1b93dd9d7c124c88f7da19cab0c5e, type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 9000810818675988291, guid: c9d1b93dd9d7c124c88f7da19cab0c5e, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -178,8 +194,35 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 3050423143048325456, guid: c9d1b93dd9d7c124c88f7da19cab0c5e, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 150766089}
   m_SourcePrefab: {fileID: 100100000, guid: c9d1b93dd9d7c124c88f7da19cab0c5e, type: 3}
+--- !u!1 &150766087 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 3050423143048325456, guid: c9d1b93dd9d7c124c88f7da19cab0c5e, type: 3}
+  m_PrefabInstance: {fileID: 150766086}
+  m_PrefabAsset: {fileID: 0}
+--- !u!20 &150766088 stripped
+Camera:
+  m_CorrespondingSourceObject: {fileID: 5855958136823608759, guid: c9d1b93dd9d7c124c88f7da19cab0c5e, type: 3}
+  m_PrefabInstance: {fileID: 150766086}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &150766089
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 150766087}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1c8bfc1efc0fb2041a405b439c9aa653, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _Camera: {fileID: 150766088}
+  _FogMaterial: {fileID: 2100000, guid: 9ea35710f6029a643a2c2fbee27d68fc, type: 2}
 --- !u!1 &291908016
 GameObject:
   m_ObjectHideFlags: 0
@@ -439,7 +482,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 10303, guid: 0000000000000000f000000000000000, type: 0}
+  - {fileID: 2100000, guid: 9ea35710f6029a643a2c2fbee27d68fc, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
