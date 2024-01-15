@@ -37,6 +37,7 @@ Shader "Unlit/UniformExponentialFog"
             uniform float4x4 InverseProjectionMatrix;
 
             uniform float FogDensity;
+            uniform float4 FogColor;
 
             v2f vert (appdata_img v)
             {
@@ -65,10 +66,11 @@ Shader "Unlit/UniformExponentialFog"
                 float4 depthViewPos = float4(i.pixelViewPos * depth, 1);
                 float3 depthWorldPos = mul(InverseViewMatrix, depthViewPos).xyz;
                 float distance = length(depthWorldPos - _WorldSpaceCameraPos.xyz);
-                float expFog = 1 - exp(-distance * FogDensity);
+                float expFog = min(1 - exp(-distance * FogDensity), 1);
                 //if (expFog > 0.7)
                 //    expFog = 0.7;
-                return colorSample + float4(expFog, expFog, expFog, 1);
+                //return colorSample + float4(expFog, expFog, expFog, 1);
+                return (1 - expFog) * colorSample + expFog * FogColor;
             }
             ENDCG
         }

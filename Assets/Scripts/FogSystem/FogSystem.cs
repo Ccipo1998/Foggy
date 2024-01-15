@@ -13,14 +13,17 @@ public class FogSystem : MonoBehaviour
     [SerializeField]
     private Material _FogMaterial;
     [SerializeField]
-    [Range(0, 0.1f)]
+    [Range(0, 1.0f)]
     private float _FogDensity;
+    [SerializeField]
+    private Color _FogColor;
 
     #region SHADER_UNIFORMS
 
     private static readonly int InverseProjectionMatrix = Shader.PropertyToID("InverseProjectionMatrix");
     private static readonly int InverseViewMatrix = Shader.PropertyToID("InverseViewMatrix");
     private static readonly int FogDensity = Shader.PropertyToID("FogDensity");
+    private static readonly int FogColor = Shader.PropertyToID("FogColor");
 
     #endregion
 
@@ -38,6 +41,7 @@ public class FogSystem : MonoBehaviour
 
         // update fog parameters
         Shader.SetGlobalFloat(FogDensity, _FogDensity);
+        Shader.SetGlobalColor(FogColor, _FogColor);
 
         // apply shader
         Graphics.Blit(source, destination, _FogMaterial);
