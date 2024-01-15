@@ -10,11 +10,21 @@ public class FogSystem : MonoBehaviour
     private Camera _Camera;
 
     [Header("Fog parameters")]
+
     [SerializeField]
     private Material _FogMaterial;
+
     [SerializeField]
     [Range(0, 1.0f)]
     private float _FogDensity;
+
+    [SerializeField]
+    private Texture2D _FogDensityTexture;
+
+    [SerializeField]
+    [Range (0, 2.0f)]
+    private float _FogDensityTextureScale;
+
     [SerializeField]
     private Color _FogColor;
 
@@ -24,6 +34,8 @@ public class FogSystem : MonoBehaviour
     private static readonly int InverseViewMatrix = Shader.PropertyToID("InverseViewMatrix");
     private static readonly int FogDensity = Shader.PropertyToID("FogDensity");
     private static readonly int FogColor = Shader.PropertyToID("FogColor");
+    private static readonly int FogDensityTexture = Shader.PropertyToID("_FogDensityTexture");
+    private static readonly int FogDensityTextureScale = Shader.PropertyToID("FogDensityTextureScale");
 
     #endregion
 
@@ -42,6 +54,8 @@ public class FogSystem : MonoBehaviour
         // update fog parameters
         Shader.SetGlobalFloat(FogDensity, _FogDensity);
         Shader.SetGlobalColor(FogColor, _FogColor);
+        Shader.SetGlobalTexture(FogDensityTexture, _FogDensityTexture);
+        Shader.SetGlobalFloat(FogDensityTextureScale, _FogDensityTextureScale);
 
         // apply shader
         Graphics.Blit(source, destination, _FogMaterial);
