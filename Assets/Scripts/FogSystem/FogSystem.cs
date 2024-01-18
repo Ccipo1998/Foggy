@@ -28,6 +28,11 @@ public class FogSystem : MonoBehaviour
     [SerializeField]
     private Color _FogColor;
 
+    [Header("Ray marching parameters")]
+
+    [SerializeField]
+    private int _StepsNumber;
+
     #region SHADER_UNIFORMS
 
     private static readonly int InverseProjectionMatrix = Shader.PropertyToID("InverseProjectionMatrix");
@@ -36,6 +41,7 @@ public class FogSystem : MonoBehaviour
     private static readonly int FogColor = Shader.PropertyToID("FogColor");
     private static readonly int FogDensityTexture = Shader.PropertyToID("_FogDensityTexture");
     private static readonly int FogDensityTextureScale = Shader.PropertyToID("FogDensityTextureScale");
+    private static readonly int StepsNumber = Shader.PropertyToID("StepsNumber");
 
     #endregion
 
@@ -56,6 +62,9 @@ public class FogSystem : MonoBehaviour
         Shader.SetGlobalColor(FogColor, _FogColor);
         Shader.SetGlobalTexture(FogDensityTexture, _FogDensityTexture);
         Shader.SetGlobalFloat(FogDensityTextureScale, _FogDensityTextureScale);
+
+        // update ray marching parameters
+        Shader.SetGlobalInteger(StepsNumber, _StepsNumber);
 
         // apply shader
         Graphics.Blit(source, destination, _FogMaterial);
