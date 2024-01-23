@@ -49,6 +49,7 @@ Shader "Unlit/RayMarchingFog"
             uniform float FogDensity;
             uniform float4 FogColor;
             uniform float FogDensityTextureScale;
+            uniform float ExctinctionCoefficient;
 
             // ray marching parameters
             uniform uint StepsNumber;
@@ -103,7 +104,7 @@ Shader "Unlit/RayMarchingFog"
 
                 float stepSize = cameraRay.length / StepsNumber;
                 float3 marchingPos;
-                float transmittance;
+                float transmittance = 1.0;
                 for (uint i = 0; i < StepsNumber; ++i)
                 {
                     // marching position
@@ -114,11 +115,14 @@ Shader "Unlit/RayMarchingFog"
                     //densitySample = tex3D(_FogDensity3DTexture, uvw * FogDensityTextureScale) * FogDensity;
 
                     // calculate transmittance with Beer Lambert Law (exponential)
-                    transmittance = BeerLambertLaw(densitySample.x, stepSize); // value between 0 and 1
+                    transmittance *= BeerLambertLaw(densitySample.x, stepSize); // value between 0 and 1
 
-                    // calculate transmitted radiance and add fog color
-                    colorSample = colorSample * transmittance + (1 - transmittance) * FogColor;
+                    // check if minimum transmittance is saturated
+                    transmittance = max(transmittance, ExctinctionCoefficient);
                 }
+
+                // calculate transmitted radiance and add fog color
+                colorSample = colorSample * transmittance + (1 - transmittance) * FogColor;
 
                 return colorSample;
             }
