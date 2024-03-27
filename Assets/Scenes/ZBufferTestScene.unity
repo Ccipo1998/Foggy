@@ -135,6 +135,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: ZBufferCamera
       objectReference: {fileID: 0}
+    - target: {fileID: 3050423143048325456, guid: c9d1b93dd9d7c124c88f7da19cab0c5e, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 5855958136823608759, guid: c9d1b93dd9d7c124c88f7da19cab0c5e, type: 3}
       propertyPath: m_ClearFlags
       value: 1
@@ -222,7 +226,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _Camera: {fileID: 150766088}
+  _SunLight: {fileID: 0}
   _FogMaterial: {fileID: 2100000, guid: 9ea35710f6029a643a2c2fbee27d68fc, type: 2}
+  _FogDensity: 0
+  _ExctinctionCoefficient: 0
+  _FogDensityTexture: {fileID: 0}
+  _FogDensityTextureScale: 0
+  _FogColor: {r: 0, g: 0, b: 0, a: 0}
+  _StepsNumber: 0
 --- !u!1 &291908016
 GameObject:
   m_ObjectHideFlags: 0
@@ -482,7 +493,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 9ea35710f6029a643a2c2fbee27d68fc, type: 2}
+  - {fileID: 10303, guid: 0000000000000000f000000000000000, type: 0}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
