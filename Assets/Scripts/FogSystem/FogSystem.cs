@@ -25,10 +25,6 @@ public class FogSystem : MonoBehaviour
     private float _FogDensity;
 
     [SerializeField]
-    [Range(0, 1.0f)]
-    private float _ExctinctionCoefficient;
-
-    [SerializeField]
     private Texture2D _FogDensityTexture;
 
     [SerializeField]
@@ -46,6 +42,14 @@ public class FogSystem : MonoBehaviour
 
     [SerializeField]
     private float _AmbientLightIntensity;
+
+    [SerializeField]
+    [Range(-1.0f, 1.0f)]
+    private float _ScatteringAnisotropy;
+
+    [SerializeField]
+    [Range(1.0f, 100.0f)]
+    private float _FogDepth;
 
     [Header("Ray marching parameters")]
 
@@ -70,7 +74,9 @@ public class FogSystem : MonoBehaviour
     private static readonly int FogDensityTexture = Shader.PropertyToID("_FogDensityTexture");
     private static readonly int FogDensityTextureScale = Shader.PropertyToID("FogDensityTextureScale");
     private static readonly int StepsNumber = Shader.PropertyToID("StepsNumber");
-    private static readonly int ExctinctionCoefficient = Shader.PropertyToID("ExctinctionCoefficient");
+    private static readonly int LightDirection = Shader.PropertyToID("LightDirection");
+    private static readonly int ScatteringAnisotropy = Shader.PropertyToID("ScatteringAnisotropy");
+    private static readonly int FogDepth = Shader.PropertyToID("FogDepth");
 
     #endregion
 
@@ -97,7 +103,9 @@ public class FogSystem : MonoBehaviour
         Shader.SetGlobalFloat(AmbientLightIntensity, _AmbientLightIntensity);
         Shader.SetGlobalTexture(FogDensityTexture, _FogDensityTexture);
         Shader.SetGlobalFloat(FogDensityTextureScale, _FogDensityTextureScale);
-        Shader.SetGlobalFloat(ExctinctionCoefficient, Mathf.Pow(_ExctinctionCoefficient, 3.0f));
+        Shader.SetGlobalVector(LightDirection, _SunLight.transform.forward);
+        Shader.SetGlobalFloat(ScatteringAnisotropy, _ScatteringAnisotropy);
+        Shader.SetGlobalFloat(FogDepth, _FogDepth);
 
         // update ray marching parameters
         Shader.SetGlobalInteger(StepsNumber, _StepsNumber);

@@ -52,7 +52,9 @@ Shader "Unlit/RayMarchingFog"
             uniform float4 AmbientLightColor;
             uniform float AmbientLightIntensity;
             uniform float FogDensityTextureScale;
-            uniform float ExctinctionCoefficient;
+            uniform float3 LightDirection;
+            uniform float ScatteringAnisotropy;
+            uniform float FogDepth;
 
             // ray marching parameters
             uniform uint StepsNumber;
@@ -85,6 +87,22 @@ Shader "Unlit/RayMarchingFog"
                 return 1.0 / (4.0 * 3.14);
             }
 
+            float HenyeyGreensteinSchlickPhaseFunction(float cosLightView, float g)
+            {
+                float k = 1.55 * g - 0.55 * pow(g, 3.0);
+                return (1.0 - pow(k, 2.0)) / (4.0 * 3.14 * pow((1.0 + k * cosLightView), 2.0));
+            }
+
+            float HenyeyGreensteinPhaseFunction(float cosLightView, float g)
+            {
+                return (1.0 - pow(g, 2.0)) / (4.0 * 3.14 * pow((1.0 + pow(g, 2.0) - 2.0 * g * cosLightView), 1.5));
+            }
+
+            float RayleighPhaseFunction(float cosLightView)
+            {
+                return (3.0 / 16.0 * 3.14) * (1.0 * pow(cosLightView, 2.0));
+            }
+
             fixed4 GetCascadeWeights(float z)
             {
                 float4 zNear = float4(z >= _LightSplitsNear); 
@@ -106,9 +124,10 @@ Shader "Unlit/RayMarchingFog"
 
                 // create ray from intersection point to pixel position                
                 ray lightRay;
-                lightRay.origin = depthWorldPos;
-                lightRay.direction = _WorldSpaceCameraPos.xyz - lightRay.origin;
+                lightRay.origin = _WorldSpaceCameraPos.xyz;
+                lightRay.direction = depthWorldPos - lightRay.origin;
                 lightRay.length = length(lightRay.direction);
+                lightRay.length = clamp(lightRay.length, 0.0, FogDepth);
                 lightRay.direction = normalize(lightRay.direction);
 
                 // calculate weights to sample unity's shadow map
@@ -126,16 +145,13 @@ Shader "Unlit/RayMarchingFog"
                 float4 inScattering = float4(0.0, 0.0, 0.0, 1.0);
                 for (uint i = 0; i < StepsNumber; ++i)
                 {
-                    // calculate transmittance with Beer Lambert Law (exponential)
-                    float deltaTransmittance = BeerLambertLaw(densitySample.x, stepSize);
-                    float oldTransmittance = transmittance;
-                    transmittance *= deltaTransmittance; // value between 0 and 1
-
-                    // check if minimum transmittance is saturated
-                    transmittance = max(transmittance, ExctinctionCoefficient);
-
                     // marching position
                     marchingPos = lightRay.origin + lightRay.direction * stepSize * i;
+
+                    // calculate transmittance with Beer Lambert Law (exponential)
+                    float deltaTransmittance = BeerLambertLaw(densitySample.x, stepSize);
+                    //deltaTransmittance = max(deltaTransmittance, ExctinctionCoefficient);
+                    transmittance *= deltaTransmittance; // value between 0 and 1
 
                     // calculate shadow term for current marching position for sun light
                     float3 shadowCoord0 = mul(unity_WorldToShadow[0], float4(marchingPos,1.0)).xyz;
@@ -154,8 +170,13 @@ Shader "Unlit/RayMarchingFog"
 
                     // for each step: apply transmittance to light incoming from previous step ...
                     colorSample = colorSample * deltaTransmittance;
-                    // ... and add in scattering light basing on shadow map and fog
-                    inScattering = LightColor * LightIntensity * shadowTerm * (1.0 - deltaTransmittance);
+                    // ... and add in scattering light basing on shadow map, fog and phase function
+                    float cosLightView = -dot(lightRay.direction, LightDirection);
+                    //float phaseFunction = HenyeyGreensteinSchlickPhaseFunction(cosLightView, ScatteringAnisotropy); -> problems with anisotropy values between 0.94 and 0.99
+                    //float phaseFunction = RayleighPhaseFunction(cosLightView);
+                    float phaseFunction = HenyeyGreensteinPhaseFunction(cosLightView, ScatteringAnisotropy);
+                    inScattering = LightColor * LightIntensity * shadowTerm * (1.0 - deltaTransmittance) * phaseFunction;
+                    //inScattering += AmbientLightColor * AmbientLightIntensity * (1.0 - shadowTerm) * (1.0 - deltaTransmittance) * phaseFunction;
                     colorSample += inScattering;
                 }
 
