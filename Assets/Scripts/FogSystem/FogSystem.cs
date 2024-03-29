@@ -56,7 +56,6 @@ public class FogSystem : MonoBehaviour
 
     private CommandBuffer _shadowmapCommandBuffer;
     private RenderTexture m_ShadowmapCopy;
-    public RenderTexture ShadowMap;
     private CommandBuffer _afterShadowPass;
 
     #region SHADER_UNIFORMS
@@ -72,7 +71,6 @@ public class FogSystem : MonoBehaviour
     private static readonly int FogDensityTextureScale = Shader.PropertyToID("FogDensityTextureScale");
     private static readonly int StepsNumber = Shader.PropertyToID("StepsNumber");
     private static readonly int ExctinctionCoefficient = Shader.PropertyToID("ExctinctionCoefficient");
-    private static readonly int ShadowMapTexture = Shader.PropertyToID("_ShadowMap");
 
     #endregion
 
@@ -104,9 +102,6 @@ public class FogSystem : MonoBehaviour
         // update ray marching parameters
         Shader.SetGlobalInteger(StepsNumber, _StepsNumber);
 
-        // update shadow map
-        Shader.SetGlobalTexture(ShadowMapTexture, ShadowMap);
-
         // apply shader
         Graphics.Blit(source, destination, _FogMaterial);
 
@@ -125,29 +120,5 @@ public class FogSystem : MonoBehaviour
         {
             _SunLight.AddCommandBuffer(LightEvent.AfterShadowMap, _afterShadowPass);
         }
-
-        //RenderTargetIdentifier shadowmap = BuiltinRenderTextureType.CurrentActive;
-        //m_ShadowmapCopy = new RenderTexture(1024, 1024, 0);
-        //m_ShadowmapCopy.filterMode = FilterMode.Point;
-        //_shadowmapCommandBuffer = new CommandBuffer();
-
-        //// Change shadow sampling mode for m_Light's shadowmap.
-        //_shadowmapCommandBuffer.SetShadowSamplingMode(shadowmap, ShadowSamplingMode.RawDepth);
-
-        //// Set global
-        //_shadowmapCommandBuffer.SetGlobalTexture("_ShadowMap", _FogDensityTexture);
-
-        //// The shadowmap values can now be sampled normally - copy it to a different render texture.
-        //_shadowmapCommandBuffer.Blit(shadowmap, new RenderTargetIdentifier(m_ShadowmapCopy));
-
-        //// Execute after the shadowmap has been filled.
-        //_SunLight.AddCommandBuffer(LightEvent.AfterShadowMap, _shadowmapCommandBuffer);
     }
-
-    //private void SetGlobalShadowTexture(Light light)
-    //{
-    //    CommandBuffer command = new CommandBuffer { name = "Volumetric Fog ShadowMap" };
-    //    command.SetGlobalTexture("ShadowMap", new RenderTargetIdentifier(BuiltinRenderTextureType.CurrentActive));
-    //    light.AddCommandBuffer(LightEvent.AfterShadowMap, command);
-    //}
 }

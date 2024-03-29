@@ -1,7 +1,5 @@
 // Upgrade NOTE: replaced 'unity_World2Shadow' with 'unity_WorldToShadow'
 
-// Upgrade NOTE: replaced 'unity_World2Shadow' with 'unity_WorldToShadow'
-
 Shader "Unlit/RayMarchingFog"
 {
     Properties
@@ -119,29 +117,19 @@ Shader "Unlit/RayMarchingFog"
                 // sample density noise
                 float4 densitySample = tex2D(_FogDensityTexture, (i.uv + _Time.x) * FogDensityTextureScale) * FogDensity;
 
-                // light data
-                //float4 lightColor = float4(1.0, 1.0, 0.85, 1.0);
-                //float directLightIntensity = 0.1f;
-                //float4 ambientLightColor = float4(1.0, 1.0, 1.0, 1.0);
-                //float indirectLightIntensity = 0.007f;
 
                 // ray marching data
-                float stepSize = lightRay.length / StepsNumber; // TODO: result should be invariant on StepsNumber in terms of total illuminance
+                float stepSize = lightRay.length / StepsNumber;
                 float3 marchingPos;
                 float transmittance = 1.0; // 1.0 -> no exctinction (no absorption nor out scattering), 0.0 -> maximum exctinction
                 float shadowTerm = 1.0; // 0.0 -> point in shadow, 1.0 -> lit point
                 float4 inScattering = float4(0.0, 0.0, 0.0, 1.0);
-                float inAmbientScattering = float4(0.0, 0.0, 0.0, 1.0);
                 for (uint i = 0; i < StepsNumber; ++i)
                 {
-                    // take new density sample
-                    //uvw.z = stepSize * i;
-                    //densitySample = tex3D(_FogDensity3DTexture, uvw * FogDensityTextureScale) * FogDensity;
-
-                    //fogColor *= transmittance;
-
                     // calculate transmittance with Beer Lambert Law (exponential)
-                    transmittance *= BeerLambertLaw(densitySample.x, stepSize); // value between 0 and 1
+                    float deltaTransmittance = BeerLambertLaw(densitySample.x, stepSize);
+                    float oldTransmittance = transmittance;
+                    transmittance *= deltaTransmittance; // value between 0 and 1
 
                     // check if minimum transmittance is saturated
                     transmittance = max(transmittance, ExctinctionCoefficient);
@@ -157,25 +145,23 @@ Shader "Unlit/RayMarchingFog"
  
                     float4 shadowCoord = float4(shadowCoord0 * weights[0] + shadowCoord1 * weights[1] + shadowCoord2 * weights[2] + shadowCoord3 * weights[3],1);
                     shadowTerm = UNITY_SAMPLE_SHADOW(ShadowMap, shadowCoord);
-                    if (stepSize * i > 100.0f)
+
+                    // at maximum depth (i.e. the sky) -> always lit point
+                    if (depth >= 0.9999)
                     {
-                        shadowTerm = 1.0f;
+                        shadowTerm = 1.0;
                     }
 
-                    // calculate in scattering
-                    //inScattering = inScattering * transmittance + lightColor * PhaseFunctionSphere() * (1.0 - transmittance);
-                    inAmbientScattering += AmbientLightColor * (1.0 - shadowTerm) * (1.0 - transmittance);
-                    inScattering += LightColor * PhaseFunctionSphere() * shadowTerm * (1.0 - transmittance);
-
-                    //colorSample = colorSample * transmittance + inScattering * (1.0 - transmittance);
+                    // for each step: apply transmittance to light incoming from previous step ...
+                    colorSample = colorSample * deltaTransmittance;
+                    // ... and add in scattering light basing on shadow map and fog
+                    inScattering = LightColor * LightIntensity * shadowTerm * (1.0 - deltaTransmittance);
+                    colorSample += inScattering;
                 }
 
-                //inScattering += lightColor * indirectLightIntensity * FogDensity;
-
                 // calculate transmitted radiance and add fog color
-                //colorSample = colorSample + fogColor;
-                return colorSample * transmittance + inScattering * LightIntensity + inAmbientScattering * AmbientLightIntensity;
-                //return colorSample;
+                //return colorSample * transmittance + inScattering * LightIntensity + AmbientLightColor * (1.0 - transmittance) * AmbientLightIntensity;
+                return colorSample + AmbientLightColor * AmbientLightIntensity * (1.0 - transmittance);
             }
             ENDCG
         }
