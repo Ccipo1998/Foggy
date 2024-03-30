@@ -32,6 +32,7 @@ Foggy:
 ![immagine](https://github.com/Ccipo1998/Foggy/assets/61557131/a97f9709-b4d0-4ff2-b9d6-0cf16c96095e)
 
 ## References
+- Scene from: https://assetstore.unity.com/packages/3d/environments/flooded-grounds-48529
 - https://bartwronski.files.wordpress.com/2014/08/bwronski_volumetric_fog_siggraph2014.pdf
 - https://developer.download.nvidia.com/assets/gameworks/papers/Fast_Flexible_Physically-Based_Volumetric_Light_Scattering.pdf
 - https://advances.realtimerendering.com/s2006/Chapter6-Real-time%20Atmospheric%20Effects%20in%20Games.pdf
